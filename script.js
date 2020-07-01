@@ -6,63 +6,74 @@
 // La partita termina quando il giocatore inserisce un numero “vietato” o raggiunge il numero massimo possibile di numeri consentiti.
 // Al termine della partita il software deve comunicare il punteggio, cioè il numero di volte che l’utente ha inserito un numero consentito.
 
-//passo 1 - computer deve generare 16 numeri casuali tra 1 e 100
-// se deve generare più numeri abbiamo bisogno di un array in cui posizionarli:
-arrayBombe = [];
-//generiamo i numeri casuali che però non siano mai uguali tra loro con il ciclo while.
-//fintanto che arrivi a 16 genera un numero a caso da 1 a 100 e poi esci, se il numero è uguale prosegui fino alla fine:
+// Il computer deve generare 16 numeri casuali tra 1 e 100.
 
-var numBombe = 16;
-
-while(arrayBombe.length < numBombe){
-  var bombe = numeroCasualeComputer(1,100);
-
-  if(verifica(arrayBombe, numBombe) != true){
-    arrayBombe.push(bombe);
+var arrayBombe = [];
+var maxBombe = 16;
+// devo generare 16 numeri ma non devono esserci doppioni
+while (arrayBombe.length < maxBombe) {
+  var bomba = numCasualeCpu(1, 50);
+  if(inArray(arrayBombe, bomba) == false) {
+    arrayBombe.push(bomba);
   }
 }
 console.log(arrayBombe);
-//chiedere all'utente di inserire un numero fino a quando non ne trova uno presente nell'arrayBombe
-//ci serve dove salvare i numeri dell'utente
-//finchè non supera il numero di caselle del campo minato (16) o non trova un numero presente nell'array Bombe, dammi un numero che vada da 1 a 100 e che non si ripeta.
-arrayUtente = [];
-var maxTentativi = 10 - 5;
-i = 0;
 
-//l'utente inserisce numeri finchè può o finchè non trova il numero bomba
-trovato = false;
-while(arrayUtente.length < maxTentativi && trovato==false){
-  var numUtente = parseInt(prompt('Dammi un numero da 1 a 100'));
-arrayUtente.push(numUtente);
+var arrayUtente = [];
+var maxTentativi = 100 - 16;
+var punti = 0;
+var i = 0;
 
-   if((verifica(numBombe, numUtente)) = true){
-     console.log('Bomba!');
-   }
+var trovato = false;
+while (arrayUtente.length < maxTentativi && trovato == false) {
+  var numero = parseInt(prompt('Inserisci un numero'));
+  // se il numero e nel range allora controllo se e in arrayBombe
+  // se non e in bombe allora lo pusho nel mio array
+  if(isInRange(1, 100, numero) == true && inArray(arrayBombe, numero) == false && inArray(arrayUtente, numero) == false) {
+    arrayUtente.push(numero);
+    punti++;
+  }
 
+  if(inArray(arrayBombe, numero)) {
+    trovato = true;
+    console.log('Bomba!');
+  }
 
+  if (punti == maxTentativi) {
+    console.log('hai vinto!');
+  }
 }
 
-console.log(arrayUtente);
+console.log('punti', punti);
 
 
-//Funzioni
-//numero randomico
-function numeroCasualeComputer(min, max) {
- min = Math.ceil(min);
- max = Math.floor(max);
- var result = Math.floor(Math.random() * (max - min + 1)) + min;
- return result;
- }
-
-// verifica che il numero non sia uguale all'altro ossia se è già presente nell'arrayBombe
-//includes
-function verifica(array, numero) {
-  i = 0;
-  trovato = false;
-  while (i < array.lenght && trovato == false){
-    if (numero == array[i]){
+// functions
+//
+function inArray (array, elemento) {
+  var i = 0;
+  var trovato = false;
+  // questo ciclo si deve interompere se raggiungo la lunghezza dell'array oppure se trovo coorispondenza
+  while (i < array.length && trovato == false) {
+    if(array[i] == elemento) {
       trovato = true;
     }
+    i++
   }
+
   return trovato;
+}
+
+function numCasualeCpu(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min; //Il max è incluso e il min è incluso
+}
+
+//l-utente non puo inserire elementi che non siano numeri e che non siano nel range giusto
+function isInRange(min, max, num) {
+
+  if(num >= min && num <= max && !isNaN(num)) {
+    return true;
+  }
+  return false;
 }
